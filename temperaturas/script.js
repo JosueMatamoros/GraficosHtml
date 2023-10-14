@@ -1,5 +1,11 @@
 // script.js
 
+// Agrega un event listener al campo de fecha
+document.getElementById("datepicker").addEventListener("change", function() {
+  // Llama a la función para dibujar la temperatura cuando la fecha cambia
+  drawTemperaturePerDay();
+});
+
 google.charts.load("current", {
   packages: ["corechart"],
 });
@@ -20,74 +26,6 @@ function drawFahrenheitChart() {
     "Temperaturas por Día (Fahrenheit)",
     "Fahrenheit"
   );
-}
-
-function drawTemperaturePerDay() {
-  // Obtener el elemento input por su ID
-  var datepickerInput = document.getElementById("datepicker");
-
-  // Obtener el valor ingresado
-  var fechaIngresada = datepickerInput.value;
-  
-  var data = new google.visualization.DataTable();
-  data.addColumn("timeofday", "Hora");
-  data.addColumn("number", "Celcius");
-  data.addColumn("number", "Fahrenheit");
-
-  data.addRows([
-    [{ v: [8, 0, 0], f: "8 am" }, 1, 8],
-    [{ v: [9, 0, 0], f: "9 am" }, 2, 4],
-    [{ v: [10, 0, 0], f: "10 am" }, 3, 1],
-    [{ v: [11, 0, 0], f: "11 am" }, 4, 2.25],
-    [{ v: [12, 0, 0], f: "12 pm" }, 5, 2.25],
-    [{ v: [13, 0, 0], f: "1 pm" }, 6, 3],
-    [{ v: [14, 0, 0], f: "2 pm" }, 7, 4],
-    [{ v: [15, 0, 0], f: "3 pm" }, 8, 5.25],
-    [{ v: [16, 0, 0], f: "4 pm" }, 9, 7.5],
-    [{ v: [17, 0, 0], f: "5 pm" }, 10, 10],
-  ]);
-
-  var options = {
-    title: "Temperatura por hora del día",
-    focusTarget: "category",
-    hAxis: {
-      title: "Hora",
-      format: "h:mm a",
-
-      textStyle: {
-        fontSize: 14,
-        color: "#053061",
-        bold: true,
-        italic: false,
-      },
-      titleTextStyle: {
-        fontSize: 18,
-        color: "#053061",
-        bold: true,
-        italic: false,
-      },
-    },
-    vAxis: {
-      title: "Rating (scale of 1-10)",
-      textStyle: {
-        fontSize: 18,
-        color: "#67001f",
-        bold: false,
-        italic: false,
-      },
-      titleTextStyle: {
-        fontSize: 18,
-        color: "#67001f",
-        bold: true,
-        italic: false,
-      },
-    },
-  };
-
-  var chart = new google.visualization.ColumnChart(
-    document.getElementById("chart_div")
-  );
-  chart.draw(data, options);
 }
 
 function drawChart(dataFile, chartTitle, yAxisTitle) {
@@ -125,3 +63,100 @@ function drawChart(dataFile, chartTitle, yAxisTitle) {
     .catch((error) => console.error("Error al cargar los datos:", error));
 }
 
+function drawTemperaturePerDay() {
+  // Obtener el elemento input por su ID
+  var datepickerInput = document.getElementById("datepicker");
+
+  // Obtener el valor ingresado
+  var fechaIngresada = datepickerInput.value;
+
+  // Realizar una solicitud fetch para obtener el archivo JSON
+  fetch('matriz.json')
+    .then(response => response.json())
+    .then(jsonObject => {
+      // Verifica si jsonObject es un objeto
+      if (
+        typeof jsonObject !== "object" ||
+        jsonObject === null ||
+        Array.isArray(jsonObject)
+      ) {
+        console.error("El contenido del archivo no es un objeto.");
+        return;
+      }
+
+      // Obtén la información para la fecha seleccionada
+      const infoForDate = jsonObject[fechaIngresada];
+
+      // Muestra la información en la consola
+      if (infoForDate) {
+        // Inicializa la DataTable
+        var data = new google.visualization.DataTable();
+        data.addColumn("timeofday", "Hora");
+        data.addColumn("number", "C");
+        data.addColumn("number", "F");
+
+        // Ordena las horas ('00' al '23')
+        const sortedHours = Object.keys(infoForDate).sort();
+
+        // Crea un array para las filas de la DataTable
+        const dataTableRows = sortedHours.map((hour) => {
+          const celcius = infoForDate[hour][0];
+          const fahrenheit = infoForDate[hour][1];
+          return [{ v: [parseInt(hour), 0, 0], f: `${hour} am` }, celcius, fahrenheit];
+        });
+
+        // Agrega las filas a la DataTable
+        data.addRows(dataTableRows);
+
+        // Configuración del gráfico
+        var options = {
+          title: `Temperatura por hora del día - ${fechaIngresada}`,
+          focusTarget: "category",
+          hAxis: {
+            title: "Hora",
+            format: "h:mm a",
+            textStyle: {
+              fontSize: 14,
+              color: "#053061",
+              bold: true,
+              italic: false,
+            },
+            titleTextStyle: {
+              fontSize: 18,
+              color: "#053061",
+              bold: true,
+              italic: false,
+            },
+          },
+          vAxis: {
+            title: "Rating (scale of 1-10)",
+            textStyle: {
+              fontSize: 18,
+              color: "#67001f",
+              bold: false,
+              italic: false,
+            },
+            titleTextStyle: {
+              fontSize: 18,
+              color: "#67001f",
+              bold: true,
+              italic: false,
+            },
+          },
+        };
+
+        // Inicializa el gráfico
+        var chart = new google.visualization.ColumnChart(
+          document.getElementById("chart_div")
+        );
+
+        // Dibuja el gráfico con los datos dinámicos
+        chart.draw(data, options);
+      } else {
+        console.log(`No hay información para la fecha ${fechaIngresada}.`);
+      }
+    })
+    .catch(error => {
+      console.error('Error al obtener el archivo JSON:', error);
+    });
+}
