@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Proyecto Microcontroladores</title>
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <!-- Google Charts -->
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <!-- flatpick -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="btn-group d-flex justify-content-center" role="group" aria-label="Basic example">
+      <button type="button" class="btn btn-primary" onclick="drawCelsiusChart()">Celsius (°C):</button>
+      <button type="button" class="btn btn-primary" onclick="drawFahrenheitChart()">Fahrenheit (°F):</button>
+      <button type="button" class="btn btn-primary" onclick="drawTemperaturePerDay()">Temperatura por Día</button>
+      <input type="text" id="datepicker" placeholder="Selecciona una fecha">
+
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <!-- Div para el gráfico -->
+        <div id="chart_div"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agregar Bootstrap JS y dependencias de Popper.js y jQuery (puedes cambiar las URLs a tus propios archivos locales si los tienes descargados) -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+  <!-- Agregar el archivo JavaScript externo -->
+  <script type="text/javascript" src="script.js"></script>
+</body>
+
+</html>
